@@ -19,7 +19,7 @@
 #pragma config WRT = OFF        // Flash Program Memory Self Write Enable bits (Write protection off)
 
 
-uint8_t contador;
+
 // #pragma config statements should precede project file includes.
 // Use project enums instead of #define for ON and OFF.
 
@@ -39,11 +39,11 @@ void InitTimer0(void);
 
 void main(void) {
     setup();
-    contador = 0;
+    
     while(1){
         
         
-        PORTB = contador;
+        
     
     
     }
@@ -55,11 +55,27 @@ void main(void) {
 
 void setup(void){
     
+    initosc(7);
+    OSCCONbits.OSTS = 0;
+    OSCCONbits.HTS = 0;
+    OSCCONbits.LTS = 0;
+    INTCONbits.GIE = 1;
+    INTCONbits.PEIE = 1;
+    INTCONbits.RBIE = 1;
+    INTCONbits.T0IE = 1;
+    INTCONbits.INTE = 1;
+    PIE1bits.ADIE = 1;
+    INTCONbits.T0IF = 0; //Bandera de Timer 0
+    INTCONbits.RBIF = 0; //Bandera de IOC
+    PIR1bits.ADIF = 0; //Bandera del ADC
+    IOCBbits.IOCB0 = 1;
+    IOCBbits.IOCB1 = 1;
+    IOCBbits.IOCB2 = 1;
     ANSEL = 0;
-    ANSELH = 0;
+    ANSELH = 0b00000001;
     TRISA = 0;
     PORTA = 0;
-    TRISB = 0;
+    TRISB = 0b00000111;
     PORTB = 0;
     TRISC = 0;
     PORTC = 0;
@@ -67,11 +83,6 @@ void setup(void){
     PORTD = 0;
     TRISE = 0;
     PORTE = 0;
-    initosc(7);
-    InitTimer0();
-    OSCCONbits.HTS;
-    OSCCONbits.LTS;
-    OSCCONbits.OSTS;
 
 
 }
@@ -86,11 +97,14 @@ void InitTimer0(){
 
 void __interrupt() isr(void) {
     if (INTCONbits.RBIF == 1) {
-        if (PORTBbits.RB0 == 1) { 
-            PORTD = PORTD - 1;
-        } else if (PORTBbits.RB1 == 1) {
-            PORTD = PORTD + 1;
+        if (PORTBbits.RB0 == 0) { 
+            PORTC = PORTC - 1;
+            INTCONbits.RBIF = 0;
+        } 
+        else if (PORTBbits.RB1 == 0) {
+            PORTC = PORTC + 1;
+            INTCONbits.RBIF = 0;
         }
-        INTCONbits.RBIF = 0; 
+         
     }
 }
