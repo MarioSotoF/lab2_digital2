@@ -18,23 +18,35 @@
 #pragma config BOR4V = BOR40V   // Brown-out Reset Selection bit (Brown-out Reset set to 4.0V)
 #pragma config WRT = OFF        // Flash Program Memory Self Write Enable bits (Write protection off)
 
+
+uint8_t contador;
 // #pragma config statements should precede project file includes.
 // Use project enums instead of #define for ON and OFF.
 
 #include <xc.h>
-#include <oscilador.h>
+#include "oscilador.h"
+
 /*
  * File:   main.c
- * Author: mario
+ * Author: Mario Soto
  *
  * Created on 6 de febrero de 2021, 07:30 PM
  */
-
+void setup(void);
+void InitTimer0(void);
 
 #include <xc.h>
 
 void main(void) {
     setup();
+    contador = 0;
+    while(1){
+        
+        
+        PORTB = contador;
+    
+    
+    }
     
     
     
@@ -42,7 +54,43 @@ void main(void) {
 }
 
 void setup(void){
+    
+    ANSEL = 0;
+    ANSELH = 0;
+    TRISA = 0;
+    PORTA = 0;
+    TRISB = 0;
+    PORTB = 0;
+    TRISC = 0;
+    PORTC = 0;
+    TRISD = 0;
+    PORTD = 0;
+    TRISE = 0;
+    PORTE = 0;
     initosc(7);
+    InitTimer0();
+    OSCCONbits.HTS;
+    OSCCONbits.LTS;
+    OSCCONbits.OSTS;
 
 
+}
+
+void InitTimer0(){
+    OPTION_REG  = 0x87;
+    TMR0        = 59;
+    INTCON      = 0xA0;
+    
+}
+
+
+void __interrupt() isr(void) {
+    if (INTCONbits.RBIF == 1) {
+        if (PORTBbits.RB0 == 1) { 
+            PORTD = PORTD - 1;
+        } else if (PORTBbits.RB1 == 1) {
+            PORTD = PORTD + 1;
+        }
+        INTCONbits.RBIF = 0; 
+    }
 }
