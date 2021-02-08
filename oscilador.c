@@ -44,7 +44,7 @@ void initosc(uint8_t IRCF){
             OSCCONbits.IRCF1 = 1;
             OSCCONbits.IRCF0 = 1;
             break;
-        default:
+        default://4MHz
             OSCCONbits.IRCF2 = 1;
             OSCCONbits.IRCF1 = 1;
             OSCCONbits.IRCF0 = 0;
